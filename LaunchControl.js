@@ -61,6 +61,18 @@ var LaunchControl = {
     }
   },
 
+  knobIndexFirstRow: function (data1) {
+    if (data1 >= 21 && data1 <= 28) {
+      return data1 - 21;
+    }
+  },
+
+  knobIndexSecondRow: function (data1) {
+    if (data1 >= 41 && data1 <= 48) {
+      return data1 - 41;
+    }
+  },
+
 
   isButtonPressedDown: function (data2) {
     return data2 > 0;

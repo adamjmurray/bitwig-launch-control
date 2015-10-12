@@ -38,7 +38,7 @@ function exit() {
 
 
 function onMidi(status, data1, data2) {
-  var macro,
+  var index,
     deviceControlMode = LaunchControl.isDeviceControlMode(status);
 
   // printMidi(status, data1, data2);
@@ -55,6 +55,7 @@ function onMidi(status, data1, data2) {
           if (deviceControlMode) {
             cursorDevice.selectPrevious();
           } else {
+            // TODO: in mixer mode, it should switch between volume/pan and return track levels
             trackBank.scrollScenesUp();
           }
           break;
@@ -63,6 +64,7 @@ function onMidi(status, data1, data2) {
           if (deviceControlMode) {
             cursorDevice.selectNext();
           } else {
+            // TODO: in mixer mode, it should switch between volume/pan and return track levels
             trackBank.scrollScenesDown();
           }
           break;
@@ -80,10 +82,24 @@ function onMidi(status, data1, data2) {
     }
 
     if(deviceControlMode) {
-      macro = LaunchControl.macroIndex(data1);
-      if (macro != null) {
-        cursorDevice.getMacro(macro).getAmount().set(data2, 128);
+      index = LaunchControl.macroIndex(data1);
+      if (index != null) {
+        cursorDevice.getMacro(index).getAmount().set(data2, 128);
       }
+    }
+    else {
+      // control volume and panning
+      index = LaunchControl.knobIndexFirstRow(data1);
+      if(index != null) {
+        trackBank.getTrack(index).getVolume().set(data2, 128);
+      }
+      else {
+        index = LaunchControl.knobIndexSecondRow(data1);
+        if(index != null) {
+          trackBank.getTrack(index).getPan().set(data2, 128);
+        }
+      }
+      // TODO: in mixer mode, can also control return rack levels
     }
   }
 
