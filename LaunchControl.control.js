@@ -13,32 +13,32 @@ var trackBank,
   DOWN_ARROW = 115,
   LEFT_ARROW = 116,
   RIGHT_ARROW = 117,
-  NUM_TRACKS = 8;
+
+  MODES = {
+    MIXER: "mixer",
+    CLIP_LAUNCH: "clip launch",
+    DEVICE_CONTROL: "device control",
+    CUSTOM: "custom"
+  },
+
+  NUM_CHANNELS = 8;
 
 
 function init() {
   var i;
-  resetLaunchControl();
-
   host.getMidiInPort(0).setMidiCallback(onMidi);
   host.getMidiInPort(0).setSysexCallback(onSysex);
 
-  trackBank = host.createTrackBank(NUM_TRACKS, 0, 1);
-
-  for (i = 0; i < NUM_TRACKS; i++) {
+  trackBank = host.createTrackBank(NUM_CHANNELS, 0, 1);
+  for (i = 0; i < NUM_CHANNELS; i++) {
     var track = trackBank.getTrack(i);
     track.getClipLauncher().setIndication(true);
   }
-
   cursorTrack = host.createArrangerCursorTrack(0, 1);
-
   cursorDevice = host.createEditorCursorDevice();
 
-  for (i = 0; i < NUM_TRACKS; i++) {
-    cursorDevice.getMacro(i).getAmount().setIndication(true);
-  }
+  resetLaunchControl();
 }
-
 
 function exit() {
   resetLaunchControl();
@@ -49,44 +49,52 @@ function exit() {
 // MIDI input handlers
 
 function onMidi(status, data1, data2) {
-  // printMidi(status, data1, data2);
-
   var macro,
     deviceControlMode = isDeviceControlMode(status);
 
-  if (isButtonPressedDown(data2)) {
-    switch (data1) {
-      case UP_ARROW:
-        if (deviceControlMode) {
-          cursorDevice.selectPrevious();
-        } else {
-          trackBank.scrollScenesUp();
-        }
-        break;
+  // printMidi(status, data1, data2);
 
-      case DOWN_ARROW:
-        if (deviceControlMode) {
-          cursorDevice.selectNext();
-        } else {
-          trackBank.scrollScenesDown();
-        }
-        break;
+  if (isNoteOn(status)) {
+    // handle pushes of the 8 buttons on bottom
 
-      case LEFT_ARROW:
-        trackBank.scrollChannelsUp();
-        cursorTrack.selectPrevious();
-        break;
+  }
+  else if (isChannelController(status)) {
+    // handle knob turns and arrow button pushes
+    if (isButtonPressedDown(data2)) {
+      switch (data1) {
+        case UP_ARROW:
+          if (deviceControlMode) {
+            cursorDevice.selectPrevious();
+          } else {
+            trackBank.scrollScenesUp();
+          }
+          break;
 
-      case RIGHT_ARROW:
-        trackBank.scrollChannelsDown();
-        cursorTrack.selectNext();
-        break;
+        case DOWN_ARROW:
+          if (deviceControlMode) {
+            cursorDevice.selectNext();
+          } else {
+            trackBank.scrollScenesDown();
+          }
+          break;
 
-      default:
-        macro = macroIndex(data1);
-        if (macro != null) {
-          cursorDevice.getMacro(macro).getAmount().set(data2, 128);
-        }
+        case LEFT_ARROW:
+          trackBank.scrollChannelsUp();
+          cursorTrack.selectPrevious();
+          break;
+
+        case RIGHT_ARROW:
+          trackBank.scrollChannelsDown();
+          cursorTrack.selectNext();
+          break;
+      }
+    }
+
+    if(deviceControlMode) {
+      macro = macroIndex(data1);
+      if (macro != null) {
+        cursorDevice.getMacro(macro).getAmount().set(data2, 128);
+      }
     }
   }
 
@@ -105,16 +113,16 @@ function onSysex(data) {
   // }
   switch (lcTemplateIndex) {
     case 8:
-      setMode("mixer");
+      onModeChange(MODES.MIXER);
       break;
     case 9:
-      setMode("clip launch");
+      onModeChange(MODES.CLIP_LAUNCH);
       break;
     case 10:
-      setMode("device control");
+      onModeChange(MODES.DEVICE_CONTROL);
       break;
     default:
-      setMode("custom");
+      onModeChange(MODES.CUSTOM);
       break;
   }
 }
@@ -127,11 +135,36 @@ function resetLaunchControl() {
   for (var i = 0; i < 16; i++) {
     sendMidi(176 + i, 0, 0);
   }
+
+  setMode(MODES.MIXER);
+  onModeChange(MODES.MIXER);
 }
 
 
-function setMode(m) {
-  host.showPopupNotification("Mode: " + m);
+function setMode(mode) {
+  var templateByte;
+  switch (mode) {
+    case MODES.MIXER:
+      templateByte = "08";
+      break;
+    case MODES.CLIP_LAUNCH:
+      templateByte = "09";
+      break;
+    case MODES.DEVICE_CONTROL:
+      templateByte = "0a";
+      break;
+  }
+  sendSysex("f0002029020a77" + templateByte + "f7");
+}
+
+
+function onModeChange(mode) {
+  host.showPopupNotification("Mode: " + mode);
+
+  var deviceControlMode = (mode === MODES.DEVICE_CONTROL);
+  for (i = 0; i < NUM_CHANNELS; i++) {
+    cursorDevice.getMacro(i).getAmount().setIndication(deviceControlMode);
+  }
 }
 
 
