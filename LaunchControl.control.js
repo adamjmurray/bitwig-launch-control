@@ -28,9 +28,19 @@ function init() {
   cursorTrack = host.createArrangerCursorTrack(0, 1);
   cursorDevice = host.createEditorCursorDevice();
 
+  for (i = 0; i < NUM_CHANNELS; i++) {
+    trackBank.getTrack(i).isActivated().addValueObserver(trackActivatedObserver(i));
+  }
+
   LaunchControl.reset();
 }
 
+function trackActivatedObserver(index) {
+  return function(value) {
+    // TODO: only do this when mode is mixer
+    LaunchControl.setButton(index, value ? 62 : 12);
+  }
+}
 
 function exit() {
   LaunchControl.reset();
@@ -110,7 +120,7 @@ function onMidi(status, data1, data2) {
   }
 
   // echo back to the device for basic button press support
-  sendMidi(status, data1, data2);
+  // sendMidi(status, data1, data2);
 }
 
 

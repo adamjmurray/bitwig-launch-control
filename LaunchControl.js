@@ -28,6 +28,7 @@ var LaunchControl = {
 
 
   onModeChange: function (mode) {
+    var i;
     host.showPopupNotification("Mode: " + mode);
 
     var deviceControlMode = (mode === MODES.DEVICE_CONTROL);
@@ -86,6 +87,19 @@ var LaunchControl = {
 
   isButtonPressedDown: function (data2) {
     return data2 > 0;
+  },
+
+
+  setButton: function (index, color) {
+    // TODO: the status byte needs to change depending on the mode
+    var data1;
+    if(index < 4) {
+      data1 = index + 9;
+    }
+    else {
+      data1 = index + 21;
+    }
+    sendMidi(152, data1, color);
   }
 
 };
