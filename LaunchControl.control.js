@@ -39,13 +39,19 @@ function exit() {
 
 function onMidi(status, data1, data2) {
   var index,
-    deviceControlMode = LaunchControl.isDeviceControlMode(status);
+    deviceControlMode = LaunchControl.isDeviceControlMode(status),
+    mixerMode = LaunchControl.isMixerMode(status);
 
   // printMidi(status, data1, data2);
 
   if (isNoteOn(status)) {
     // handle pushes of the 8 buttons on bottom
-
+    if (mixerMode) {
+      index = LaunchControl.buttonIndex(data1);
+      if (index != null) {
+        trackBank.getTrack(index).isActivated().toggle();
+      }
+    }
   }
   else if (isChannelController(status)) {
     // handle knob turns and arrow button pushes
@@ -81,7 +87,7 @@ function onMidi(status, data1, data2) {
       }
     }
 
-    if(deviceControlMode) {
+    if (deviceControlMode) {
       index = LaunchControl.macroIndex(data1);
       if (index != null) {
         cursorDevice.getMacro(index).getAmount().set(data2, 128);
@@ -90,12 +96,12 @@ function onMidi(status, data1, data2) {
     else {
       // control volume and panning
       index = LaunchControl.knobIndexFirstRow(data1);
-      if(index != null) {
+      if (index != null) {
         trackBank.getTrack(index).getVolume().set(data2, 128);
       }
       else {
         index = LaunchControl.knobIndexSecondRow(data1);
-        if(index != null) {
+        if (index != null) {
           trackBank.getTrack(index).getPan().set(data2, 128);
         }
       }
@@ -134,5 +140,5 @@ function onSysex(data) {
       break;
   }
 
-  if(mode) LaunchControl.onModeChange(mode);
+  if (mode) LaunchControl.onModeChange(mode);
 }

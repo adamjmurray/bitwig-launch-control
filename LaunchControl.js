@@ -74,6 +74,16 @@ var LaunchControl = {
   },
 
 
+  buttonIndex: function (data1) {
+    if (data1 >= 9 && data1 <= 12) {
+      return data1 - 9;
+    }
+    else if (data1 >= 25 && data1 <= 28) {
+      return data1 - 21;
+    }
+  },
+
+
   isButtonPressedDown: function (data2) {
     return data2 > 0;
   }
