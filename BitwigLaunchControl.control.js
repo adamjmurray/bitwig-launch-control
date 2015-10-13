@@ -16,31 +16,29 @@ var trackBank,
 
 
 function init() {
-  var i;
+  var i,
+    track,
+    clipLauncherSlots;
+
   host.getMidiInPort(0).setMidiCallback(onMidi);
   host.getMidiInPort(0).setSysexCallback(onSysex);
 
-  trackBank = host.createTrackBank(NUM_CHANNELS, 0, 1);
-  for (i = 0; i < NUM_CHANNELS; i++) {
-    var track = trackBank.getTrack(i);
-    track.getClipLauncher().setIndication(true);
-  }
+  trackBank = host.createTrackBank(CHANNELS, 0, 1);
   cursorTrack = host.createArrangerCursorTrack(0, 1);
   cursorDevice = host.createEditorCursorDevice();
 
-  for (i = 0; i < NUM_CHANNELS; i++) {
-    trackBank.getTrack(i).isActivated().addValueObserver(trackActivatedObserver(i));
+  for (i = 0; i < CHANNELS; i++) {
+    track = trackBank.getTrack(i);
+    clipLauncherSlots = track.getClipLauncherSlots();
+
+    track.isActivated().addValueObserver(observeTrackActivated(i));
+    clipLauncherSlots.setIndication(true);
+    clipLauncherSlots.addColorObserver(observeClipLauncherSlotsColor(i));
   }
 
   LaunchControl.reset();
 }
 
-function trackActivatedObserver(index) {
-  return function(value) {
-    // TODO: only do this when mode is mixer
-    LaunchControl.setButton(index, value ? 62 : 12);
-  }
-}
 
 function exit() {
   LaunchControl.reset();
@@ -118,22 +116,12 @@ function onMidi(status, data1, data2) {
       // TODO: in mixer mode, can also control return rack levels
     }
   }
-
-  // echo back to the device for basic button press support
-  // sendMidi(status, data1, data2);
 }
 
 
 function onSysex(data) {
   var lcTemplateIndex = data.hexByteAt(7),
     mode;
-
-  // if(lcTemplateIndex < 8) {
-  //   println("Launch Control Template: User #" + (lcTemplateIndex+1));
-  // }
-  // else {
-  //   println("Launch Control Template: Factory #" + (lcTemplateIndex-7));
-  // }
 
   switch (lcTemplateIndex) {
     case 8:
@@ -151,4 +139,35 @@ function onSysex(data) {
   }
 
   if (mode) LaunchControl.onModeChange(mode);
+}
+
+
+//function flush() {
+//  println('in flush!');
+//}
+
+// TODO: when switching modes, these observers don't get called again, so
+// the button colors are not in the correct state.
+// We can fix this by keeping track of all the needed state and handling this
+// in the flush() function
+
+function observeTrackActivated(trackBankIndex) {
+  return function(value) {
+    if(LaunchControl.isMixerMode()) {
+      var color = value ? 1 : 0.25;
+      LaunchControl.setButton(trackBankIndex, color, color);
+    }
+  }
+}
+
+
+function observeClipLauncherSlotsColor(trackBankIndex) {
+  // first arg (slotIndex) is always 0,
+  // I guess because we are accessing this via a track bank
+  return function(_, red, green, blue) {
+    if(LaunchControl.isClipLaunchMode()) {
+      // use exponential range to coerce low values to 0
+      LaunchControl.setButton(trackBankIndex, red*red, green*green);
+    }
+  }
 }

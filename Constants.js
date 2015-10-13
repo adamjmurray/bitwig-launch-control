@@ -11,4 +11,4 @@ var
     CUSTOM: "custom"
   },
 
-  NUM_CHANNELS = 8;
+  CHANNELS = 8;

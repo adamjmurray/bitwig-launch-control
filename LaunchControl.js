@@ -1,10 +1,14 @@
 var LaunchControl = {
 
+  mode: null,
+  modeChannel: null,
+
+
   reset: function () {
     for (var i = 0; i < 16; i++) {
       sendMidi(176 + i, 0, 0);
     }
-    LaunchControl.setMode(MODES.MIXER);
+    this.setMode(MODES.MIXER);
   },
 
 
@@ -22,17 +26,30 @@ var LaunchControl = {
         break;
     }
     sendSysex("f0002029020a77" + templateByte + "f7");
-
-    LaunchControl.onModeChange(mode);
+    this.onModeChange(mode);
   },
 
 
   onModeChange: function (mode) {
     var i;
+
+    this.mode = mode;
+    switch(mode) {
+      case MODES.MIXER:
+        this.modeChannel = 8;
+        break;
+      case MODES.CLIP_LAUNCH:
+        this.modeChannel = 9;
+        break;
+      case MODES.DEVICE_CONTROL:
+        this.modeChannel = 10;
+        break;
+    }
+
     host.showPopupNotification("Mode: " + mode);
 
     var deviceControlMode = (mode === MODES.DEVICE_CONTROL);
-    for (i = 0; i < NUM_CHANNELS; i++) {
+    for (i = 0; i < CHANNELS; i++) {
       cursorDevice.getMacro(i).getAmount().setIndication(deviceControlMode);
     }
   },
@@ -40,15 +57,18 @@ var LaunchControl = {
 
   isMixerMode: function (status) {
     // 3 possible status values for knobs, button down, button up
-    return status === 184 || status === 136 || status === 152;
+    // return status === 184 || status === 136 || status === 152;
+    return this.mode === MODES.MIXER;
   },
 
   isClipLaunchMode: function (status) {
-    return status === 185 || status === 137 || status === 153;
+    // return status === 185 || status === 137 || status === 153;
+    return this.mode === MODES.CLIP_LAUNCH;
   },
 
   isDeviceControlMode: function (status) {
-    return status === 186 || status === 138 || status === 154;
+    // return status === 186 || status === 138 || status === 154;
+    return this.mode === MODES.DEVICE_CONTROL;
   },
 
 
@@ -90,16 +110,32 @@ var LaunchControl = {
   },
 
 
-  setButton: function (index, color) {
-    // TODO: the status byte needs to change depending on the mode
-    var data1;
+  setButton: function (index, red, green) {
+    var data1,
+      data2 = this.color(red, green);
     if(index < 4) {
       data1 = index + 9;
     }
     else {
       data1 = index + 21;
     }
-    sendMidi(152, data1, color);
-  }
+    sendNoteOn(this.modeChannel, data1, data2);
+  },
 
+
+  /**
+   * Calculate color value for use with LaunchPad.setButton(index,color)
+   * @param red 0.0 - 1.0 (off - brightest)
+   * @param green 0.0 - 1.0 (off - brightest)
+   */
+  color: function(red, green) {
+    var color = 16*Math.round(3 * green) + Math.round(3 * red) + 12;
+
+    if(color <= 12 && (red > 0 || green > 0)) {
+      return 13; // return dim red instead of 'off' when there should be some color
+    }
+    else {
+      return color;
+    }
+  }
 };
