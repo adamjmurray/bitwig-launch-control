@@ -53,82 +53,95 @@ function onMidi(status, data1, data2) {
     isClipLaunchMode = LaunchControl.isClipLaunchMode(),
     isDeviceControlMode = LaunchControl.isDeviceControlMode();
 
-    // printMidi(status, data1, data2);
+  // printMidi(status, data1, data2);
 
   if (isNoteOn(status)) {
     // handle pushes of the 8 buttons on bottom
     index = LaunchControl.buttonIndex(data1);
-    if (index != null) {
-      track = trackBank.getTrack(index);
-      if (isMixerMode) {
-        track.isActivated().toggle();
-      }
-      else if (isClipLaunchMode) {
-        clipLauncherSlots = track.getClipLauncherSlots();
-        // we're using a single-scene track bank, so the slot index is always 0
-        clipLauncherSlots.launch(0);
-      }
+    if (index == null) return;
+
+    track = trackBank.getTrack(index);
+    if (!track) return;
+
+    if (isMixerMode) {
+      track.isActivated().toggle();
+    }
+    else if (isClipLaunchMode) {
+      clipLauncherSlots = track.getClipLauncherSlots();
+      // we're using a single-scene track bank, so the slot index is always 0
+      clipLauncherSlots.launch(0);
     }
   }
   else if (isChannelController(status)) {
-    // handle knob turns and arrow button pushes (which are CCs)
-    if (LaunchControl.isButtonPressedDown(data2)) {
-      switch (data1) {
-        case UP_ARROW:
-          if (isMixerMode) {
-            // TODO: in mixer mode, switch between volume/pan and return track levels
-          }
-          else if (isClipLaunchMode) {
-            trackBank.scrollScenesUp();
-          }
-          else if (isDeviceControlMode) {
-            cursorDevice.selectPrevious();
-          }
-          break;
+    // arrow button pushes (which are CCs), and knob turns
+    switch (data1) {
 
-        case DOWN_ARROW:
-          if (isMixerMode) {
-            // TODO: in mixer mode, switch between volume/pan and return track levels
-          }
-          else if (isClipLaunchMode) {
-            trackBank.scrollScenesDown();
-          }
-          else if (isDeviceControlMode) {
-            cursorDevice.selectNext();
-          }
-          break;
-
-        case LEFT_ARROW:
-          trackBank.scrollChannelsUp();
-          cursorTrack.selectPrevious();
-          break;
-
-        case RIGHT_ARROW:
-          trackBank.scrollChannelsDown();
-          cursorTrack.selectNext();
-          break;
+    case UP_ARROW:
+      if (!LaunchControl.isButtonPressedDown(data2)) {
+        // button is being lifted, ignore
+        return;
       }
-    }
+      else if (isMixerMode) {
+        // TODO: in mixer mode, switch between volume/pan and return track levels
+      }
+      else if (isClipLaunchMode) {
+        trackBank.scrollScenesUp();
+      }
+      else if (isDeviceControlMode) {
+        cursorDevice.selectPrevious();
+      }
+      break;
 
-    if (isDeviceControlMode) {
-      index = LaunchControl.macroIndex(data1);
-      if (index != null) {
-        cursorDevice.getMacro(index).getAmount().set(data2, 128);
+    case DOWN_ARROW:
+      if (!LaunchControl.isButtonPressedDown(data2)) {
+        // button is being lifted, ignore
+        return;
       }
-    }
-    else {
-      // control volume and panning
-      index = LaunchControl.knobIndexFirstRow(data1);
-      if (index != null) {
-        trackBank.getTrack(index).getVolume().set(data2, 128);
+      else if (isMixerMode) {
+        // TODO: in mixer mode, switch between volume/pan and return track levels
       }
-      else {
-        index = LaunchControl.knobIndexSecondRow(data1);
+      else if (isClipLaunchMode) {
+        trackBank.scrollScenesDown();
+      }
+      else if (isDeviceControlMode) {
+        cursorDevice.selectNext();
+      }
+      break;
+
+    case LEFT_ARROW:
+      if (!LaunchControl.isButtonPressedDown(data2)) return;
+      trackBank.scrollChannelsUp();
+      cursorTrack.selectPrevious();
+      break;
+
+    case RIGHT_ARROW:
+      if (!LaunchControl.isButtonPressedDown(data2)) return;
+      trackBank.scrollChannelsDown();
+      cursorTrack.selectNext();
+      break;
+
+    default:
+
+      if (isMixerMode) {
+        // control volume and panning
+        index = LaunchControl.knobIndexFirstRow(data1);
         if (index != null) {
-          trackBank.getTrack(index).getPan().set(data2, 128);
+          trackBank.getTrack(index).getVolume().set(data2, 128);
+        }
+        else {
+          index = LaunchControl.knobIndexSecondRow(data1);
+          if (index != null) {
+            trackBank.getTrack(index).getPan().set(data2, 128);
+          }
+        }
+        // TODO: in mixer mode, can also control return rack levels
+      }
+      else if (isDeviceControlMode) {
+        index = LaunchControl.macroIndex(data1);
+        if (index != null) {
+          cursorDevice.getMacro(index).getAmount().set(data2, 128);
         }
       }
-      // TODO: in mixer mode, can also control return rack levels
     }
   }
 }
@@ -139,18 +152,18 @@ function onSysex(data) {
     mode;
 
   switch (lcTemplateIndex) {
-    case 8:
-      mode = MODES.MIXER;
-      break;
-    case 9:
-      mode = MODES.CLIP_LAUNCH;
-      break;
-    case 10:
-      mode = MODES.DEVICE_CONTROL;
-      break;
-    default:
-      mode = MODES.CUSTOM;
-      break;
+  case 8:
+    mode = MODES.MIXER;
+    break;
+  case 9:
+    mode = MODES.CLIP_LAUNCH;
+    break;
+  case 10:
+    mode = MODES.DEVICE_CONTROL;
+    break;
+  default:
+    mode = MODES.CUSTOM;
+    break;
   }
 
   if (mode) LaunchControl.onModeChange(mode);
@@ -168,7 +181,7 @@ function onSysex(data) {
 
 function observeTrackActivated(trackBankIndex) {
   return function(value) {
-    if(LaunchControl.isMixerMode()) {
+    if (LaunchControl.isMixerMode()) {
       var color = value ? 1 : 0.25;
       LaunchControl.setButton(trackBankIndex, color, color);
     }
@@ -180,9 +193,9 @@ function observeClipLauncherSlotsColor(trackBankIndex) {
   // first arg (slotIndex) is always 0,
   // I guess because we are accessing this via a track bank
   return function(_, red, green, blue) {
-    if(LaunchControl.isClipLaunchMode()) {
+    if (LaunchControl.isClipLaunchMode()) {
       // use exponential range to coerce low values to 0
-      LaunchControl.setButton(trackBankIndex, red*red, green*green);
+      LaunchControl.setButton(trackBankIndex, red * red, green * green);
     }
   }
 }
