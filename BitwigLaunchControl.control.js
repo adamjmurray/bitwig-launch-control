@@ -12,7 +12,8 @@ host.addDeviceNameBasedDiscoveryPair(["Launch Control"], ["Launch Control"]);
 
 var trackBank,
   cursorTrack,
-  cursorDevice;
+  cursorDevice,
+  ignoreNextSelectedTrackChange = false;
 
 
 function init() {
@@ -23,7 +24,7 @@ function init() {
   host.getMidiInPort(0).setMidiCallback(onMidi);
   host.getMidiInPort(0).setSysexCallback(onSysex);
 
-  trackBank = host.createTrackBank(CHANNELS, 0, 1);
+  trackBank = host.createTrackBank(CHANNELS, 2, 1);
   cursorTrack = host.createArrangerCursorTrack(0, 1);
   cursorDevice = host.createEditorCursorDevice();
 
@@ -35,6 +36,7 @@ function init() {
     clipLauncherSlots.setIndication(true);
     clipLauncherSlots.addColorObserver(observeClipLauncherSlotsColor(i));
   }
+  cursorTrack.addPositionObserver(selectedTrackIndexObserver);
 
   LaunchControl.reset();
 }
@@ -111,12 +113,14 @@ function onMidi(status, data1, data2) {
     case LEFT_ARROW:
       if (!LaunchControl.isButtonPressedDown(data2)) return;
       trackBank.scrollChannelsUp();
+      ignoreNextSelectedTrackChange = true;
       cursorTrack.selectPrevious();
       break;
 
     case RIGHT_ARROW:
       if (!LaunchControl.isButtonPressedDown(data2)) return;
       trackBank.scrollChannelsDown();
+      ignoreNextSelectedTrackChange = true;
       cursorTrack.selectNext();
       break;
 
@@ -196,6 +200,24 @@ function observeClipLauncherSlotsColor(trackBankIndex) {
     if (LaunchControl.isClipLaunchMode()) {
       // use exponential range to coerce low values to 0
       LaunchControl.setButton(trackBankIndex, red * red, green * green);
+    }
+  }
+}
+
+
+function selectedTrackIndexObserver(selectedTrackIndex) {
+  if (ignoreNextSelectedTrackChange) {
+    ignoreNextSelectedTrackChange = false;
+  }
+  else {
+    // scrollToChannel() isn't smart enough to keep 8 channels visible in the track bank
+    // this hack makes things self-correct:
+    if (selectedTrackIndex > 0) {
+      trackBank.scrollToChannel(selectedTrackIndex-1);
+      trackBank.scrollChannelsDown();
+    }
+    else {
+      trackBank.scrollToChannel(0);
     }
   }
 }
