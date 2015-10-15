@@ -73,6 +73,7 @@ var LaunchControl = {
   },
 
 
+  // TODO: collapse these 3 into a single function
   macroIndex: function (data1) {
     if (data1 >= 21 && data1 <= 24) {
       return data1 - 21;

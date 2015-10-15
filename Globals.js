@@ -11,4 +11,9 @@ var
     CUSTOM: "custom"
   },
 
-  CHANNELS = 8;
+  CHANNELS = 8,
+
+
+  trackBank,
+  cursorTrack,
+  cursorDevice;
