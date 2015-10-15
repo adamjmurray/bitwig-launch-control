@@ -47,39 +47,54 @@ function exit() {
 
 function onMidi(status, data1, data2) {
   var index,
-    deviceControlMode = LaunchControl.isDeviceControlMode(status),
-    mixerMode = LaunchControl.isMixerMode(status);
+    track,
+    clipLauncherSlots,
+    isMixerMode = LaunchControl.isMixerMode(),
+    isClipLaunchMode = LaunchControl.isClipLaunchMode(),
+    isDeviceControlMode = LaunchControl.isDeviceControlMode();
 
-  // printMidi(status, data1, data2);
+    // printMidi(status, data1, data2);
 
   if (isNoteOn(status)) {
     // handle pushes of the 8 buttons on bottom
-    if (mixerMode) {
-      index = LaunchControl.buttonIndex(data1);
-      if (index != null) {
-        trackBank.getTrack(index).isActivated().toggle();
+    index = LaunchControl.buttonIndex(data1);
+    if (index != null) {
+      track = trackBank.getTrack(index);
+      if (isMixerMode) {
+        track.isActivated().toggle();
+      }
+      else if (isClipLaunchMode) {
+        clipLauncherSlots = track.getClipLauncherSlots();
+        // we're using a single-scene track bank, so the slot index is always 0
+        clipLauncherSlots.launch(0);
       }
     }
   }
   else if (isChannelController(status)) {
-    // handle knob turns and arrow button pushes
+    // handle knob turns and arrow button pushes (which are CCs)
     if (LaunchControl.isButtonPressedDown(data2)) {
       switch (data1) {
         case UP_ARROW:
-          if (deviceControlMode) {
-            cursorDevice.selectPrevious();
-          } else {
-            // TODO: in mixer mode, it should switch between volume/pan and return track levels
+          if (isMixerMode) {
+            // TODO: in mixer mode, switch between volume/pan and return track levels
+          }
+          else if (isClipLaunchMode) {
             trackBank.scrollScenesUp();
+          }
+          else if (isDeviceControlMode) {
+            cursorDevice.selectPrevious();
           }
           break;
 
         case DOWN_ARROW:
-          if (deviceControlMode) {
-            cursorDevice.selectNext();
-          } else {
-            // TODO: in mixer mode, it should switch between volume/pan and return track levels
+          if (isMixerMode) {
+            // TODO: in mixer mode, switch between volume/pan and return track levels
+          }
+          else if (isClipLaunchMode) {
             trackBank.scrollScenesDown();
+          }
+          else if (isDeviceControlMode) {
+            cursorDevice.selectNext();
           }
           break;
 
@@ -95,7 +110,7 @@ function onMidi(status, data1, data2) {
       }
     }
 
-    if (deviceControlMode) {
+    if (isDeviceControlMode) {
       index = LaunchControl.macroIndex(data1);
       if (index != null) {
         cursorDevice.getMacro(index).getAmount().set(data2, 128);

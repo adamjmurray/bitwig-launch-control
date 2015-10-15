@@ -58,6 +58,7 @@ var LaunchControl = {
   isMixerMode: function (status) {
     // 3 possible status values for knobs, button down, button up
     // return status === 184 || status === 136 || status === 152;
+    // return status & 0x0F === 8;
     return this.mode === MODES.MIXER;
   },
 
@@ -129,7 +130,7 @@ var LaunchControl = {
    * @param green 0.0 - 1.0 (off - brightest)
    */
   color: function(red, green) {
-    var color = 16*Math.round(3 * green) + Math.round(3 * red) + 12;
+    var color = 16 * Math.round(3 * green) + Math.round(3 * red) + 12;
 
     if(color <= 12 && (red > 0 || green > 0)) {
       return 13; // return dim red instead of 'off' when there should be some color
