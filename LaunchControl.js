@@ -8,7 +8,7 @@ var LaunchControl = {
       sendMidi(176 + i, 0, 0);
     }
     this.selectTemplate(8); // mixer mode
-    Input.onModeChange(MODES.MIXER);
+    Events.onModeChange(MODES.MIXER);
   },
 
 

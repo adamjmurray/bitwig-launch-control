@@ -1,15 +1,16 @@
-var Input = {
+var Events = {
 
-  ignoreNextSelectedTrackChange: false,
-  allowTrackBankRangeNotification: false,
-  allowDeviceNameNotification: false,
+  // "private" fields
+  _ignoreNextSelectedTrackChange: false,
+  _allowTrackBankRangeNotification: false,
+  _allowDeviceNameNotification: false,
 
 
   onMidi: function(status, data1, data2) {
     // printMidi(status, data1, data2);
 
     if (isNoteOn(status)) {
-      Input.onBottomRowButtonPress(LaunchControl.buttonIndex(data1));
+      Events.onBottomRowButtonPress(LaunchControl.buttonIndex(data1));
     }
     else if (isChannelController(status)) {
       // arrow button pushes (which are CCs), and knob turns
@@ -17,26 +18,26 @@ var Input = {
 
       case UP_ARROW:
         if (!LaunchControl.isButtonPressedDown(data2)) return; // else button is being lifted, so ignore
-        Input.onUpArrow();
+        Events.onUpArrow();
         break;
 
       case DOWN_ARROW:
         if (!LaunchControl.isButtonPressedDown(data2)) return;
-        Input.onDownArrow();
+        Events.onDownArrow();
         break;
 
       case LEFT_ARROW:
         if (!LaunchControl.isButtonPressedDown(data2)) return;
-        Input.onLeftArrow();
+        Events.onLeftArrow();
         break;
 
       case RIGHT_ARROW:
         if (!LaunchControl.isButtonPressedDown(data2)) return;
-        Input.onRightArrow();
+        Events.onRightArrow();
         break;
 
       default:
-        Input.onKnobTurn(data1, data2);
+        Events.onKnobTurn(data1, data2);
       }
     }
   },
@@ -63,7 +64,7 @@ var Input = {
       break;
     }
 
-    if (mode) Input.onModeChange(mode);
+    if (mode) Events.onModeChange(mode);
   },
 
 
@@ -109,7 +110,7 @@ var Input = {
       trackBank.scrollScenesUp();
     }
     else if (State.isDeviceControlMode()) {
-      Input.allowDeviceNameNotification = true;
+      Events._allowDeviceNameNotification = true;
       cursorDevice.selectPrevious();
     }
   },
@@ -122,23 +123,23 @@ var Input = {
       trackBank.scrollScenesDown();
     }
     else if (State.isDeviceControlMode()) {
-      Input.allowDeviceNameNotification = true;
+      Events._allowDeviceNameNotification = true;
       cursorDevice.selectNext();
     }
   },
 
   onLeftArrow: function() {
-    Input.ignoreNextSelectedTrackChange = true;
-    Input.allowTrackBankRangeNotification = true;
-    Input.allowDeviceNameNotification = true;
+    Events._ignoreNextSelectedTrackChange = true;
+    Events._allowTrackBankRangeNotification = true;
+    Events._allowDeviceNameNotification = true;
     trackBank.scrollChannelsUp();
     cursorTrack.selectPrevious();
   },
 
   onRightArrow: function() {
-    Input.ignoreNextSelectedTrackChange = true;
-    Input.allowTrackBankRangeNotification = true;
-    Input.allowDeviceNameNotification = true;
+    Events._ignoreNextSelectedTrackChange = true;
+    Events._allowTrackBankRangeNotification = true;
+    Events._allowDeviceNameNotification = true;
     trackBank.scrollChannelsDown();
     cursorTrack.selectNext();
   },
@@ -195,8 +196,8 @@ var Input = {
 
   onSelectedTrackIndexChange: function(selectedTrackIndex) {
     State.selectedTrack.index = selectedTrackIndex;
-    if (Input.ignoreNextSelectedTrackChange) {
-      Input.ignoreNextSelectedTrackChange = false;
+    if (Events._ignoreNextSelectedTrackChange) {
+      Events._ignoreNextSelectedTrackChange = false;
     }
     else {
       // scrollToChannel() isn't smart enough to keep 8 channels visible in the track bank
@@ -214,8 +215,8 @@ var Input = {
 
   onTrackBankPositionChange: function(startIndex) {
     State.trackBank.startIndex = startIndex;
-    if (Input.allowTrackBankRangeNotification) {
-      Input.allowTrackBankRangeNotification = false;
+    if (Events._allowTrackBankRangeNotification) {
+      Events._allowTrackBankRangeNotification = false;
       if (!State.isDeviceControlMode()) {
         // Minor bug: the end track number is wrong when there are fewer than 8 tracks.
         host.showPopupNotification("Controlling tracks: " + (startIndex + 1) + "-" + (startIndex + CHANNELS));
@@ -226,8 +227,8 @@ var Input = {
 
   onSelectedDeviceNameChange: function(deviceName) {
     State.selectedDevice.name = deviceName;
-    if (Input.allowDeviceNameNotification) {
-      Input.allowDeviceNameNotification = false;
+    if (Events._allowDeviceNameNotification) {
+      Events._allowDeviceNameNotification = false;
       if (State.isDeviceControlMode() && deviceName) {
         host.showPopupNotification("Controlling device: " + deviceName);
       }

@@ -1,8 +1,27 @@
+var
+  UP_ARROW = 114,
+  DOWN_ARROW = 115,
+  LEFT_ARROW = 116,
+  RIGHT_ARROW = 117,
+
+  MODES = {
+    MIXER: "mixer",
+    CLIP_LAUNCH: "clip launch",
+    DEVICE_CONTROL: "device control",
+    CUSTOM: "custom"
+  },
+
+  CHANNELS = 8,
+
+  trackBank,
+  cursorTrack,
+  cursorDevice;
+
+
 loadAPI(1);
-load("Globals.js");
 load("Utils.js");
 load("State.js");
-load("Input.js");
+load("Events.js");
 load("LaunchControl.js");
 
 
@@ -17,8 +36,8 @@ function init() {
     track,
     clipLauncherSlots;
 
-  host.getMidiInPort(0).setMidiCallback(Input.onMidi);
-  host.getMidiInPort(0).setSysexCallback(Input.onSysex);
+  host.getMidiInPort(0).setMidiCallback(Events.onMidi);
+  host.getMidiInPort(0).setSysexCallback(Events.onSysex);
 
   trackBank = host.createTrackBank(CHANNELS, 2, 1);
   cursorTrack = host.createArrangerCursorTrack(0, 1);
@@ -28,15 +47,15 @@ function init() {
     track = trackBank.getTrack(i);
     clipLauncherSlots = track.getClipLauncherSlots();
 
-    track.isActivated().addValueObserver(Input.observeTrackActivated(i));
+    track.isActivated().addValueObserver(Events.observeTrackActivated(i));
     clipLauncherSlots.setIndication(true);
-    clipLauncherSlots.addColorObserver(Input.observeClipLauncherSlotsColor(i));
+    clipLauncherSlots.addColorObserver(Events.observeClipLauncherSlotsColor(i));
   }
-  cursorTrack.addPositionObserver(Input.onSelectedTrackIndexChange);
+  cursorTrack.addPositionObserver(Events.onSelectedTrackIndexChange);
 
-  cursorDevice.addNameObserver(128, "", Input.onSelectedDeviceNameChange);
+  cursorDevice.addNameObserver(128, "", Events.onSelectedDeviceNameChange);
 
-  trackBank.addChannelScrollPositionObserver(Input.onTrackBankPositionChange, -1);
+  trackBank.addChannelScrollPositionObserver(Events.onTrackBankPositionChange, -1);
 
   LaunchControl.reset();
 }
