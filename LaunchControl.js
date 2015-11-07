@@ -1,75 +1,22 @@
 var LaunchControl = {
 
-  mode: null,
-  modeChannel: null,
+  channel: null,
 
 
   reset: function () {
     for (var i = 0; i < 16; i++) {
       sendMidi(176 + i, 0, 0);
     }
-    this.setMode(MODES.MIXER);
+    this.selectTemplate(8); // mixer mode
+    Input.onModeChange(MODES.MIXER);
   },
 
 
-  setMode: function (mode) {
-    var templateByte;
-    switch (mode) {
-      case MODES.MIXER:
-        templateByte = "08";
-        break;
-      case MODES.CLIP_LAUNCH:
-        templateByte = "09";
-        break;
-      case MODES.DEVICE_CONTROL:
-        templateByte = "0a";
-        break;
-    }
+  selectTemplate: function (index) {
+    if (!(index >= 0 && index < 16)) return;
+    var templateByte = "0" + index.toString(16);
+    this.channel = index;
     sendSysex("f0002029020a77" + templateByte + "f7");
-    this.onModeChange(mode);
-  },
-
-
-  onModeChange: function (mode) {
-    var i;
-
-    this.mode = mode;
-    switch(mode) {
-      case MODES.MIXER:
-        this.modeChannel = 8;
-        break;
-      case MODES.CLIP_LAUNCH:
-        this.modeChannel = 9;
-        break;
-      case MODES.DEVICE_CONTROL:
-        this.modeChannel = 10;
-        break;
-    }
-
-    host.showPopupNotification("Mode: " + mode);
-
-    var deviceControlMode = (mode === MODES.DEVICE_CONTROL);
-    for (i = 0; i < CHANNELS; i++) {
-      cursorDevice.getMacro(i).getAmount().setIndication(deviceControlMode);
-    }
-  },
-
-
-  isMixerMode: function (status) {
-    // 3 possible status values for knobs, button down, button up
-    // return status === 184 || status === 136 || status === 152;
-    // return status & 0x0F === 8;
-    return this.mode === MODES.MIXER;
-  },
-
-  isClipLaunchMode: function (status) {
-    // return status === 185 || status === 137 || status === 153;
-    return this.mode === MODES.CLIP_LAUNCH;
-  },
-
-  isDeviceControlMode: function (status) {
-    // return status === 186 || status === 138 || status === 154;
-    return this.mode === MODES.DEVICE_CONTROL;
   },
 
 
@@ -112,6 +59,27 @@ var LaunchControl = {
   },
 
 
+  /**
+   * Set a (bottom row) button color to indicate a track is activated or not
+   */
+  displayTrackActivated: function (index, isActivated) {
+    var color = isActivated ? 1 : 0.25;
+    LaunchControl.setButton(index, color, color);
+  },
+
+
+  /**
+   * Set a (bottom row) button color approximating the raw red,green,blue values from Bitwig
+   */
+  displayClipColor: function (index, red, green, blue) {
+    // use exponential range to coerce low values to 0
+    this.setButton(index, red * red, green * green);
+  },
+
+
+  /**
+   * Set a (bottom row) button's red and green LEDs. Values can go from 0.0 - 1.0
+   */
   setButton: function (index, red, green) {
     var data1,
       data2 = this.color(red, green);
@@ -121,7 +89,7 @@ var LaunchControl = {
     else {
       data1 = index + 21;
     }
-    sendNoteOn(this.modeChannel, data1, data2);
+    sendNoteOn(this.channel, data1, data2);
   },
 
 
@@ -138,6 +106,20 @@ var LaunchControl = {
     }
     else {
       return color;
+    }
+  },
+
+
+  refreshButtons: function () {
+    var i, rgb;
+    for (i = 0; i < CHANNELS; i++) {
+      if (State.isMixerMode()) {
+        LaunchControl.displayTrackActivated(i, State.trackBank.activatedStates[i]);
+      }
+      else if (State.isClipLaunchMode()) {
+        rgb = State.trackBank.clipColors[i];
+        LaunchControl.displayClipColor(i, rgb[0], rgb[1], rgb[2]);
+      }
     }
   }
 };

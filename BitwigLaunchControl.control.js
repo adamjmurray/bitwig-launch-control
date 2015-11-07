@@ -1,6 +1,7 @@
 loadAPI(1);
 load("Globals.js");
 load("Utils.js");
+load("State.js");
 load("Input.js");
 load("LaunchControl.js");
 
@@ -33,6 +34,10 @@ function init() {
   }
   cursorTrack.addPositionObserver(Input.onSelectedTrackIndexChange);
 
+  cursorDevice.addNameObserver(128, "", Input.onSelectedDeviceNameChange);
+
+  trackBank.addChannelScrollPositionObserver(Input.onTrackBankPositionChange, -1);
+
   LaunchControl.reset();
 }
 
@@ -43,10 +48,5 @@ function exit() {
 
 
 //function flush() {
-//  println('in flush!');
+//  // println('in flush!');
 //}
-
-// TODO: when switching modes, these observers don't get called again, so
-// the button colors are not in the correct state.
-// We can fix this by keeping track of all the needed state and handling this
-// in the flush() function
