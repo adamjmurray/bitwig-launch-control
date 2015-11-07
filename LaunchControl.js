@@ -63,8 +63,12 @@ var LaunchControl = {
    * Set a (bottom row) button color to indicate a track is activated or not
    */
   displayTrackActivated: function (index, isActivated) {
-    var color = isActivated ? 1 : 0.25;
-    LaunchControl.setButton(index, color, color);
+    if (isActivated) {
+      LaunchControl.setButton(index, 0, 1);
+    }
+    else {
+      LaunchControl.setButton(index, 0.25, 0.25);
+    }
   },
 
 
