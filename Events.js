@@ -194,6 +194,17 @@ var Events = {
   },
 
 
+  onSelectedDeviceNameChange: function(deviceName) {
+    State.selectedDevice.name = deviceName;
+    if (Events._allowDeviceNameNotification) {
+      Events._allowDeviceNameNotification = false;
+      if (State.isDeviceControlMode() && deviceName) {
+        host.showPopupNotification("Controlling device: " + deviceName);
+      }
+    }
+  },
+
+
   onSelectedTrackIndexChange: function(selectedTrackIndex) {
     State.selectedTrack.index = selectedTrackIndex;
     if (Events._ignoreNextSelectedTrackChange) {
@@ -218,20 +229,15 @@ var Events = {
     if (Events._allowTrackBankRangeNotification) {
       Events._allowTrackBankRangeNotification = false;
       if (!State.isDeviceControlMode()) {
-        // Minor bug: the end track number is wrong when there are fewer than 8 tracks.
-        host.showPopupNotification("Controlling tracks: " + (startIndex + 1) + "-" + (startIndex + CHANNELS));
+        host.showPopupNotification("Controlling tracks: " + (startIndex+1) + "-" +
+          Math.min(startIndex+CHANNELS, State.trackBank.trackCount));
       }
     }
   },
 
 
-  onSelectedDeviceNameChange: function(deviceName) {
-    State.selectedDevice.name = deviceName;
-    if (Events._allowDeviceNameNotification) {
-      Events._allowDeviceNameNotification = false;
-      if (State.isDeviceControlMode() && deviceName) {
-        host.showPopupNotification("Controlling device: " + deviceName);
-      }
-    }
+  onTrackBankTrackCountChange: function(trackCount) {
+    State.trackBank.trackCount = trackCount;
   }
+
 };

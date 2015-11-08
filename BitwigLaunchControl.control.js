@@ -56,6 +56,7 @@ function init() {
   cursorDevice.addNameObserver(128, "", Events.onSelectedDeviceNameChange);
 
   trackBank.addChannelScrollPositionObserver(Events.onTrackBankPositionChange, -1);
+  trackBank.addChannelCountObserver(Events.onTrackBankTrackCountChange);
 
   LaunchControl.reset();
 }
