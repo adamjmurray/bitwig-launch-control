@@ -48,6 +48,7 @@ function init() {
     clipLauncherSlots = track.getClipLauncherSlots();
 
     track.isActivated().addValueObserver(Events.observeTrackActivated(i));
+    track.exists().addValueObserver(Events.observeTrackExists(i));
     clipLauncherSlots.setIndication(true);
     clipLauncherSlots.addColorObserver(Events.observeClipLauncherSlotsColor(i));
   }

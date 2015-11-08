@@ -13,6 +13,7 @@ var State = {
   trackBank: {
     startIndex: -1,
     trackCount: -1,
+    existsStates: [],
     activatedStates: [],
     clipColors: []
   },

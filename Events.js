@@ -172,6 +172,16 @@ var Events = {
   },
 
 
+  observeTrackExists: function(trackBankIndex) {
+    return function onTrackExistsChange(exists) {
+      State.trackBank.existsStates[trackBankIndex] = exists;
+      if(!exists) {
+        LaunchControl.setButton(trackBankIndex, 0, 0);
+      }
+    }
+  },
+
+
   observeTrackActivated: function(trackBankIndex) {
     return function onTrackActivatedChange(isActivated) {
       State.trackBank.activatedStates[trackBankIndex] = isActivated;

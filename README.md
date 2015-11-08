@@ -4,7 +4,6 @@
 
 * More button display feedback
   - In device control view, simply display a red light or not depending on whether a device is actively selected
-  - Improve display of mixer buttons. No track means no light.
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
 

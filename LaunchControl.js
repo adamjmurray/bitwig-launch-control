@@ -62,8 +62,11 @@ var LaunchControl = {
   /**
    * Set a (bottom row) button color to indicate a track is activated or not
    */
-  displayTrackActivated: function (index, isActivated) {
-    if (isActivated) {
+  displayTrackActivated: function(index, isActivated) {
+    if (!State.trackBank.existsStates[index]) {
+      LaunchControl.setButton(index, 0, 0);
+    }
+    else if (isActivated) {
       LaunchControl.setButton(index, 0, 1);
     }
     else {
