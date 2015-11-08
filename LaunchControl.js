@@ -84,6 +84,19 @@ var LaunchControl = {
   },
 
 
+  displayDeviceActivated: function(isActivated) {
+    if (State.selectedDevice.name === NONEXISTANT) {
+      LaunchControl.setButton(0, 0, 0);
+    }
+    else if (isActivated) {
+      LaunchControl.setButton(0, 1, 0);
+    }
+    else {
+      LaunchControl.setButton(0, 0.25, 0.25);
+    }
+  },
+
+
   /**
    * Set a (bottom row) button's red and green LEDs. Values can go from 0.0 - 1.0
    */
@@ -126,6 +139,9 @@ var LaunchControl = {
       else if (State.isClipLaunchMode()) {
         rgb = State.trackBank.clipColors[i];
         LaunchControl.displayClipColor(i, rgb[0], rgb[1], rgb[2]);
+      }
+      else if (State.isDeviceControlMode()) {
+        LaunchControl.displayDeviceActivated(true);
       }
     }
   }

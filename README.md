@@ -2,14 +2,13 @@
 
 ## TODO List:
 
+* up/down arrows in mixer mode to select the sends (use the track bank!)
+
 * More button display feedback
-  - In device control view, simply display a red light or not depending on whether a device is actively selected
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
 
-* selecting a scene in Bitwig (with mouse) should update clip colors in clip launch mode
-
-* up/down arrows in mixer mode to select the sends (use the track bank!)
+* device activation handling, see TODO in onSelectedDeviceNameChange() (also update refreshButtons())
 
 * Changing mode should probably hide the clip launch indicators? (but don't lose track of where they are if tracks are changed)
 

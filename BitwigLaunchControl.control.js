@@ -15,7 +15,9 @@ var
 
   trackBank,
   cursorTrack,
-  cursorDevice;
+  cursorDevice,
+
+  NONEXISTANT = "___nonexistant___";
 
 
 loadAPI(1);
@@ -54,7 +56,7 @@ function init() {
   }
   cursorTrack.addPositionObserver(Events.onSelectedTrackIndexChange);
 
-  cursorDevice.addNameObserver(128, "", Events.onSelectedDeviceNameChange);
+  cursorDevice.addNameObserver(128, NONEXISTANT, Events.onSelectedDeviceNameChange);
 
   trackBank.addChannelScrollPositionObserver(Events.onTrackBankPositionChange, -1);
   trackBank.addChannelCountObserver(Events.onTrackBankTrackCountChange);
