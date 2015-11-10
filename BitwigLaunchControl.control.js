@@ -14,6 +14,7 @@ var
   CHANNELS = 8,
 
   trackBank,
+  effectTrackBank,
   cursorTrack,
   cursorDevice,
 
@@ -41,7 +42,8 @@ function init() {
   host.getMidiInPort(0).setMidiCallback(Events.onMidi);
   host.getMidiInPort(0).setSysexCallback(Events.onSysex);
 
-  trackBank = host.createTrackBank(CHANNELS, 2, 1);
+  trackBank = host.createTrackBank(CHANNELS, 256, 1);
+  effectTrackBank = host.createEffectTrackBank(1, 1);
   cursorTrack = host.createArrangerCursorTrack(0, 1);
   cursorDevice = host.createEditorCursorDevice();
 
@@ -59,7 +61,9 @@ function init() {
   cursorDevice.addNameObserver(128, NONEXISTANT, Events.onSelectedDeviceNameChange);
 
   trackBank.addChannelScrollPositionObserver(Events.onTrackBankPositionChange, -1);
-  trackBank.addChannelCountObserver(Events.onTrackBankTrackCountChange);
+  trackBank.addChannelCountObserver(Events.onTrackCountChange);
+  // TODO: I think we should be able to use addSendCountObserver() but it doesn't seem to work!
+  effectTrackBank.addChannelCountObserver(Events.onEffectTrackCountChange);
 
   LaunchControl.reset();
 }

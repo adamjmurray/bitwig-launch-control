@@ -2,13 +2,18 @@
 
 ## TODO List:
 
-* up/down arrows in mixer mode to select the sends (use the track bank!)
+* Respect NotificationSettings (and try using this interface to display selection changes instead of custom code)
 
 * More button display feedback
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
 
 * device activation handling, see TODO in onSelectedDeviceNameChange() (also update refreshButtons())
+
+* display send names in popup notification?
+
+* send scrolling is buggy if you delete a *named* send. I think this is a bug in Bitwig. Report it
+  Also, trackBand.onSendCountChange() doesn't seem to work. And send scrolling doesn't seem to work. wtf...
 
 * Changing mode should probably hide the clip launch indicators? (but don't lose track of where they are if tracks are changed)
 

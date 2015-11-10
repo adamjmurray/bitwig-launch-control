@@ -2,6 +2,10 @@ var State = {
 
   mode: null,
 
+  trackCount: -1,
+
+  sendCount: -1,
+
   selectedTrack: {
     index: -1
   },
@@ -12,10 +16,15 @@ var State = {
 
   trackBank: {
     startIndex: -1,
-    trackCount: -1,
     existsStates: [],
     activatedStates: [],
     clipColors: []
+  },
+
+  mixerMode: {
+    // -1 means we're controlling volume & pan
+    // otherwise this is the start index of the 1-2 sends we are controlling
+    sendIndex: -1
   },
 
 

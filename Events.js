@@ -44,8 +44,8 @@ var Events = {
 
 
   onSysex: function(data) {
-    var channel = data.hexByteAt(7),
-      mode;
+    var mode,
+      channel = data.hexByteAt(7);
 
     LaunchControl.channel = channel;
 
@@ -64,19 +64,19 @@ var Events = {
       break;
     }
 
-    if (mode) Events.onModeChange(mode);
+    Events.onModeChange(mode);
   },
 
 
   onModeChange: function (mode) {
-    var deviceControlMode = (mode === MODES.DEVICE_CONTROL);
+    var isDeviceControlMode = (mode === MODES.DEVICE_CONTROL);
 
     State.mode = mode;
 
     host.showPopupNotification("Mode: " + mode);
 
     for (var i = 0; i < CHANNELS; i++) {
-      cursorDevice.getMacro(i).getAmount().setIndication(deviceControlMode);
+      cursorDevice.getMacro(i).getAmount().setIndication(isDeviceControlMode);
     }
 
     LaunchControl.refreshButtons();
@@ -104,7 +104,12 @@ var Events = {
 
   onUpArrow: function() {
     if (State.isMixerMode()) {
-      // TODO: in mixer mode, switch between volume/pan and return track levels
+      if (State.mixerMode.sendIndex >= 0) {
+        // changing from controlling sends to pan/volume
+        sendIndex = State.mixerMode.sendIndex = -1;
+        host.showPopupNotification("Controlling Pan and Volume");
+      }
+      // TODO: test this against the behavior in Live
     }
     else if (State.isClipLaunchMode()) {
       trackBank.scrollScenesUp();
@@ -116,8 +121,27 @@ var Events = {
   },
 
   onDownArrow: function() {
+    var sendIndex, notification;
     if (State.isMixerMode()) {
-      // TODO: in mixer mode, switch between volume/pan and return track levels
+      sendIndex = State.mixerMode.sendIndex;
+      if (sendIndex < 0) {
+        // changing from controlling pan/volume to sends
+        sendIndex = 0;
+      }
+      else {
+        if (sendIndex+2 < State.sendCount) {
+          sendIndex += 2;
+        }
+        else { // wrap-around
+          sendIndex = 0;
+        }
+      }
+      if (State.mixerMode.sendIndex !== sendIndex) {
+        State.mixerMode.sendIndex = sendIndex;
+        notification = "Controlling Sends " + (sendIndex + 1);
+        if (State.sendCount > sendIndex + 1) notification += "-" + (sendIndex + 2);
+        host.showPopupNotification(notification);
+      }
     }
     else if (State.isClipLaunchMode()) {
       trackBank.scrollScenesDown();
@@ -146,21 +170,35 @@ var Events = {
 
 
   onKnobTurn: function(data1, data2) {
-    var index;
+    var index, sendIndex;
 
     if (State.isMixerMode()) {
       // control volume and panning
       index = LaunchControl.knobIndexFirstRow(data1);
+      sendIndex = State.mixerMode.sendIndex;
       if (index != null) {
-        trackBank.getTrack(index).getVolume().set(data2, 128);
-      }
-      else {
-        index = LaunchControl.knobIndexSecondRow(data1);
-        if (index != null) {
+        // top row of knobs
+        if (sendIndex >= 0) {
+          trackBank.getTrack(index).getSend(sendIndex).set(data2, 128);
+        }
+        else {
           trackBank.getTrack(index).getPan().set(data2, 128);
         }
       }
-      // TODO: in mixer mode, can also control return rack levels
+      else {
+        // bottom row of knobs
+        index = LaunchControl.knobIndexSecondRow(data1);
+        if (index != null) {
+          if (sendIndex >= 0) {
+            if (sendIndex+1 < State.sendCount) {
+              trackBank.getTrack(index).getSend(sendIndex + 1).set(data2, 128);
+            }
+          }
+          else {
+            trackBank.getTrack(index).getVolume().set(data2, 128);
+          }
+        }
+      }
     }
 
     else if (State.isDeviceControlMode()) {
@@ -226,6 +264,7 @@ var Events = {
       Events._ignoreNextSelectedTrackChange = false;
     }
     else {
+      // TODO: check if Live does this behavior. Maybe just get rid of this behavior/hack
       // scrollToChannel() isn't smart enough to keep 8 channels visible in the track bank
       // this hack makes things self-correct:
       if (selectedTrackIndex > 0) {
@@ -245,14 +284,27 @@ var Events = {
       Events._allowTrackBankRangeNotification = false;
       if (!State.isDeviceControlMode()) {
         host.showPopupNotification("Controlling tracks: " + (startIndex+1) + "-" +
-          Math.min(startIndex+CHANNELS, State.trackBank.trackCount));
+          Math.min(startIndex+CHANNELS, State.trackCount));
       }
     }
   },
 
 
-  onTrackBankTrackCountChange: function(trackCount) {
-    State.trackBank.trackCount = trackCount;
+  /**
+   * Observes number of all tracks, including effect (send) tracks and the master track
+   */
+  onTrackCountChange: function(trackCount) {
+    State.trackCount = trackCount;
+  },
+
+  /**
+   * Observes number of effect (send) tracks
+   */
+  onEffectTrackCountChange: function(sendCount) {
+    State.sendCount = sendCount;
+    if(State.mixerModeSendIndex >= sendCount) {
+      // TODO: fix mixer mode state
+    }
   }
 
 };
