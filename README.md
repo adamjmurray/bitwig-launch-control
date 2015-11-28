@@ -2,8 +2,6 @@
 
 ## TODO List:
 
-* Respect NotificationSettings (and try using this interface to display selection changes instead of custom code)
-
 * More button display feedback
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?

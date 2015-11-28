@@ -27,6 +27,8 @@ var State = {
     sendIndex: -1
   },
 
+  notificationsEnabled: false,
+
 
   isMixerMode: function() {
     return this.mode === MODES.MIXER;

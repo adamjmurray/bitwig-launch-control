@@ -3,12 +3,14 @@ var LaunchControl = {
   channel: null,
 
 
-  reset: function () {
+  reset: function (isInitializing) {
     for (var i = 0; i < 16; i++) {
       sendMidi(176 + i, 0, 0);
     }
-    this.selectTemplate(8); // mixer mode
-    Events.onModeChange(MODES.MIXER);
+    if (isInitializing) {
+      this.selectTemplate(8); // mixer mode
+      Events.onModeChange(MODES.MIXER);
+    }
   },
 
 

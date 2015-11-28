@@ -11,6 +11,12 @@ var Utils = {
         // println(prop + ': ' + err);
       }
     }
+  },
+
+  notify: function(message) {
+    if (State.notificationsEnabled) {
+      host.showPopupNotification(message);
+    }
   }
 
 };

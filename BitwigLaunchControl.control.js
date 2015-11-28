@@ -17,13 +17,14 @@ var
   effectTrackBank,
   cursorTrack,
   cursorDevice,
+  notificationSettings,
 
   NONEXISTANT = "___nonexistant___";
 
 
 loadAPI(1);
-load("Utils.js");
 load("State.js");
+load("Utils.js");
 load("Events.js");
 load("LaunchControl.js");
 
@@ -65,12 +66,19 @@ function init() {
   // TODO: I think we should be able to use addSendCountObserver() but it doesn't seem to work!
   effectTrackBank.addChannelCountObserver(Events.onEffectTrackCountChange);
 
-  LaunchControl.reset();
+  notificationSettings = host.getNotificationSettings();
+  notificationSettings.setShouldShowValueNotifications(true);
+  // Automatic device selection notifications don't seem to work when changing tracks, so I just
+  // implemented it myself. See Events.onSelectedDeviceNameChange()
+  // notificationSettings.setShouldShowDeviceSelectionNotifications(true);
+  notificationSettings.getUserNotificationsEnabled().addValueObserver(Events.onUserNotificationsEnabledChange);
+
+  LaunchControl.reset(true);
 }
 
 
 function exit() {
-  LaunchControl.reset();
+  LaunchControl.reset(false);
 }
 
 

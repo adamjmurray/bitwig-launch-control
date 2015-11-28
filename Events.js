@@ -73,7 +73,7 @@ var Events = {
 
     State.mode = mode;
 
-    host.showPopupNotification("Mode: " + mode);
+    Utils.notify("Mode: " + mode);
 
     for (var i = 0; i < CHANNELS; i++) {
       cursorDevice.getMacro(i).getAmount().setIndication(isDeviceControlMode);
@@ -107,7 +107,7 @@ var Events = {
       if (State.mixerMode.sendIndex >= 0) {
         // changing from controlling sends to pan/volume
         sendIndex = State.mixerMode.sendIndex = -1;
-        host.showPopupNotification("Controlling Pan and Volume");
+        Utils.notify("Pan and Volume");
       }
       // TODO: test this against the behavior in Live
     }
@@ -138,9 +138,9 @@ var Events = {
       }
       if (State.mixerMode.sendIndex !== sendIndex) {
         State.mixerMode.sendIndex = sendIndex;
-        notification = "Controlling Sends " + (sendIndex + 1);
+        notification = "Sends " + (sendIndex + 1);
         if (State.sendCount > sendIndex + 1) notification += "-" + (sendIndex + 2);
-        host.showPopupNotification(notification);
+        Utils.notify(notification);
       }
     }
     else if (State.isClipLaunchMode()) {
@@ -248,7 +248,7 @@ var Events = {
       Events._allowDeviceNameNotification = false;
       if (State.isDeviceControlMode()) {
         if(deviceName !== NONEXISTANT) {
-          host.showPopupNotification("Controlling device: " + deviceName);
+          Utils.notify("Device: " + deviceName);
         }
         // TODO: we can dim the light if the device is deactivated
         // we can also allow button presses to toggle device activation
@@ -283,7 +283,7 @@ var Events = {
     if (Events._allowTrackBankRangeNotification) {
       Events._allowTrackBankRangeNotification = false;
       if (!State.isDeviceControlMode()) {
-        host.showPopupNotification("Controlling tracks: " + (startIndex+1) + "-" +
+        Utils.notify("Tracks: " + (startIndex+1) + "-" +
           Math.min(startIndex+CHANNELS, State.trackCount));
       }
     }
@@ -305,6 +305,10 @@ var Events = {
     if(State.mixerModeSendIndex >= sendCount) {
       // TODO: fix mixer mode state
     }
+  },
+
+  onUserNotificationsEnabledChange: function(notificationsEnabled) {
+    State.notificationsEnabled = notificationsEnabled;
   }
 
 };
