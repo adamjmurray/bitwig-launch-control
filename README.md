@@ -1,6 +1,54 @@
-# bitwig-launch-control
+# Bitwig LaunchControl
 
-## TODO List:
+This is a [Bitwig Studio](http://www.bitwig.com) controller script for the
+[Novation LaunchControl](http://global.novationmusic.com/launch/launch-control).
+
+It reproduces the
+[LaunchControl's Ableton Live features](http://global.novationmusic.com/sites/default/files/novation/downloads/7375/launch-control-ableton-live-guide.pdf)
+inside of Bitwig Studio.
+
+See [Bitwig's controller scripts page](http://www.bitwig.com/en/community/control_scripts.html) for more info.
+
+
+## Setup
+
+1. Download [bitwig-launch-control.zip](https://github.com/adamjmurray/bitwig-launch-control/archive/master.zip)
+2. Unzip in:
+    * Windows: `%USERPROFILE%\Documents\Bitwig Studio\Controller Scripts\ `
+    * Mac: `~/Documents/Bitwig Studio/Controller Scripts/`
+    * Linux: `~/Bitwig Studio/Controller Scripts/`
+3. Start / restart Bitwig Studio
+4. Plug in your LaunchControl
+5. Go to Bitwig Preferences &rarr; Controllers
+6. Click "Detect Available Controllers".
+    * The LaunchControl should appear automatically. If not, try adding it manually.
+
+Problems? See [Bitwig's Control Script Installation Guide](http://www.bitwig.com/en/community/control_scripts/installation_guide)
+
+
+## Usage
+
+This script reproduces the LaunchControl's behavior for Ableton Live inside Bitwig Studio.
+See the [LaunchControl's' manual for Ableton Live](http://global.novationmusic.com/sites/default/files/novation/downloads/7375/launch-control-ableton-live-guide.pdf)
+for usage instructions.
+
+
+## Known Issues and Limitations
+
+* Can't scroll to master track in device control mode.
+
+* Send scrolling is buggy if you delete a *named* send.
+  Appears to be a bug in Bitwig that may clear up in the future.
+
+
+## Changelog
+
+| Version | Release&nbsp;Date | Notes |
+| ------- | ------------ | ----- |
+| 1.0     | coming soon | Initial Release. Reproduces the LaunchControl's Ableton Live features.
+
+
+## TODOs:
 
 * More button display feedback
   - light up arrow buttons when scrolling is possible, no need to light on press
@@ -8,14 +56,9 @@
 
 * device activation handling, see TODO in onSelectedDeviceNameChange() (also update refreshButtons())
 
-* display send names in popup notification?
-
-* send scrolling is buggy if you delete a *named* send. I think this is a bug in Bitwig. Report it
+* Report bug with deleting named sends (see below).
   Also, trackBand.onSendCountChange() doesn't seem to work. And send scrolling doesn't seem to work. wtf...
 
-* Changing mode should probably hide the clip launch indicators? (but don't lose track of where they are if tracks are changed)
+* Cleanup TODOs
 
-* Seems like device navigation doesn't work if nothing is selected (i.e. make a new track, drop some devices on it, try to navigate with LC)
-
-* Can't scroll to master track. Meh?
-
+* Test custom mode. Test behavior against Live.
