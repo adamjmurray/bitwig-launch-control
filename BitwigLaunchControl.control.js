@@ -60,6 +60,7 @@ function init() {
   cursorTrack.addPositionObserver(Events.onSelectedTrackIndexChange);
 
   cursorDevice.addNameObserver(128, NONEXISTANT, Events.onSelectedDeviceNameChange);
+  cursorDevice.addIsEnabledObserver(Events.onSelectedDeviceEnabledChange);
 
   trackBank.addChannelScrollPositionObserver(Events.onTrackBankPositionChange, -1);
   trackBank.addChannelCountObserver(Events.onTrackCountChange);

@@ -40,6 +40,9 @@ for usage instructions.
 * Send scrolling is buggy if you delete a *named* send.
   Appears to be a bug in Bitwig that may clear up in the future.
 
+* Sometimes the first attempt to switch the Factory Template (AKA mode) doesn't work.
+  Workaround: Switch to another template and back to the one you want.
+
 
 ## Changelog
 
@@ -50,15 +53,17 @@ for usage instructions.
 
 ## TODOs:
 
+* Press button in device control mode to toggle device enabled state.
+
 * More button display feedback
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
 
-* device activation handling, see TODO in onSelectedDeviceNameChange() (also update refreshButtons())
+* Document additional features beyond the Ableton Live features. Does device control mode in Live display device
+  enabled state on the LaunchControl? I don't think you can toggle the device on and off either.
 
-* Report bug with deleting named sends (see below).
-  Also, trackBand.onSendCountChange() doesn't seem to work. And send scrolling doesn't seem to work. wtf...
+* Investigate bug with deleting named sends (see known issues). Might need to report bug to Bitwig support.
 
-* Cleanup TODOs
+* Investigate: trackBank.addSendCountObserver() doesn't seem to work.
 
-* Test custom mode. Test behavior against Live.
+* Investigate: trackBank.scrollSendsUp() / Down() doesn't seem to work.

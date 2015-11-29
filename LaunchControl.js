@@ -86,14 +86,14 @@ var LaunchControl = {
   },
 
 
-  displayDeviceActivated: function(isActivated) {
-    if (State.selectedDevice.name === NONEXISTANT) {
+  displayDeviceState: function() {
+    if (State.selectedDevice.isNonExistant()) {
       LaunchControl.setButton(0, 0, 0);
     }
-    else if (isActivated) {
+    else if (State.selectedDevice.enabled) {
       LaunchControl.setButton(0, 1, 0);
     }
-    else {
+    else { // exists but deactivated
       LaunchControl.setButton(0, 0.25, 0.25);
     }
   },
@@ -143,7 +143,12 @@ var LaunchControl = {
         LaunchControl.displayClipColor(i, rgb[0], rgb[1], rgb[2]);
       }
       else if (State.isDeviceControlMode()) {
-        LaunchControl.displayDeviceActivated(true);
+        if (i === 0) {
+          LaunchControl.displayDeviceState();
+        }
+        else {
+          LaunchControl.setButton(i, 0, 0);
+        }
       }
     }
   }

@@ -247,13 +247,19 @@ var Events = {
     if (Events._allowDeviceNameNotification) {
       Events._allowDeviceNameNotification = false;
       if (State.isDeviceControlMode()) {
-        if(deviceName !== NONEXISTANT) {
+        if(!State.selectedDevice.isNonExistant()) {
           Utils.notify("Device: " + deviceName);
         }
-        // TODO: we can dim the light if the device is deactivated
-        // we can also allow button presses to toggle device activation
-        LaunchControl.displayDeviceActivated(true);
+        LaunchControl.displayDeviceState();
       }
+    }
+  },
+
+
+  onSelectedDeviceEnabledChange: function(isEnabled) {
+    State.selectedDevice.enabled = isEnabled;
+    if (State.isDeviceControlMode()) {
+      LaunchControl.displayDeviceState();
     }
   },
 

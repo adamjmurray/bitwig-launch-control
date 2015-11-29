@@ -11,7 +11,11 @@ var State = {
   },
 
   selectedDevice: {
-    name: ""
+    name: "",
+    enabled: false,
+    isNonExistant: function() {
+      return this.name === NONEXISTANT;
+    }
   },
 
   trackBank: {
