@@ -99,6 +99,9 @@ var Events = {
       // we're using a single-scene track bank, so the slot index is always 0
       clipLauncherSlots.launch(0);
     }
+    else if (State.isDeviceControlMode()) {
+      cursorDevice.toggleEnabledState();
+    }
   },
 
 

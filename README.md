@@ -53,8 +53,6 @@ for usage instructions.
 
 ## TODOs:
 
-* Press button in device control mode to toggle device enabled state.
-
 * More button display feedback
   - light up arrow buttons when scrolling is possible, no need to light on press
   - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
