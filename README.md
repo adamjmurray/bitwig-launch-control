@@ -44,24 +44,24 @@ for usage instructions.
   Workaround: Switch to another template and back to the one you want.
 
 
+## Feature Requests
+
+Have a feature request?
+Open an issue on [this script's github project](https://github.com/adamjmurray/bitwig-launch-control/issues)
+and I'll consider it.
+
+
 ## Changelog
 
 | Version | Release&nbsp;Date | Notes |
 | ------- | ------------ | ----- |
 | 1.0     | coming soon | Initial Release. Reproduces the LaunchControl's Ableton Live features.
 
+The current version of this project is a 1.0 release candidate. It should be perfectly useable.
 
-## TODOs:
 
-* More button display feedback
-  - light up arrow buttons when scrolling is possible, no need to light on press
-  - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
+## License
 
-* Document additional features beyond the Ableton Live features. Does device control mode in Live display device
-  enabled state on the LaunchControl? I don't think you can toggle the device on and off either.
-
-* Investigate bug with deleting named sends (see known issues). Might need to report bug to Bitwig support.
-
-* Investigate: trackBank.addSendCountObserver() doesn't seem to work.
-
-* Investigate: trackBank.scrollSendsUp() / Down() doesn't seem to work.
+This software is released under [the MIT license](https://en.wikipedia.org/wiki/MIT_License).
+See [license.txt](https://github.com/adamjmurray/bitwig-launch-control/blob/master/license.txt)
+Basically, do whatever you want with it. The developers are not liable for any issues encountered.

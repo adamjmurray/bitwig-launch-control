@@ -1,3 +1,19 @@
+/* TODOs:
+
+ - More button display feedback
+     - light up arrow buttons when scrolling is possible, no need to light on press
+     - In clip launcher, probably want active/non-active lighting and blinking when queueing up start (or even stop)?
+
+ - Document additional features beyond the Ableton Live features. Does device control mode in Live display device
+ enabled state on the LaunchControl? I don't think you can toggle the device on and off either.
+
+ - Investigate bug with deleting named sends (see known issues). Might need to report bug to Bitwig support.
+
+ - Investigate: trackBank.addSendCountObserver() doesn't seem to work.
+
+ _ Investigate: trackBank.scrollSendsUp() / Down() doesn't seem to work.
+*/
+
 var
   UP_ARROW = 114,
   DOWN_ARROW = 115,
