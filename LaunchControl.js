@@ -132,6 +132,11 @@ var LaunchControl = {
   },
 
 
+  setArrowButton: function(arrowButton, isEnabled) {
+    sendChannelController(this.channel, arrowButton, (isEnabled ? 127 : 0));
+  },
+
+
   refreshButtons: function () {
     var i, rgb;
     for (i = 0; i < CHANNELS; i++) {
@@ -151,5 +156,9 @@ var LaunchControl = {
         }
       }
     }
+    this.setArrowButton(UP_ARROW, State.scrollState.canScrollUp());
+    this.setArrowButton(DOWN_ARROW, State.scrollState.canScrollDown());
+    this.setArrowButton(LEFT_ARROW, State.scrollState.canScrollLeft());
+    this.setArrowButton(RIGHT_ARROW, State.scrollState.canScrollRight());
   }
 };

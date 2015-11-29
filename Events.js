@@ -111,6 +111,8 @@ var Events = {
         // changing from controlling sends to pan/volume
         sendIndex = State.mixerMode.sendIndex = -1;
         Utils.notify("Pan and Volume");
+        LaunchControl.setArrowButton(UP_ARROW, State.scrollState.canScrollUp());
+        LaunchControl.setArrowButton(DOWN_ARROW, State.scrollState.canScrollDown());
       }
       // TODO: test this against the behavior in Live
     }
@@ -144,6 +146,8 @@ var Events = {
         notification = "Sends " + (sendIndex + 1);
         if (State.sendCount > sendIndex + 1) notification += "-" + (sendIndex + 2);
         Utils.notify(notification);
+        LaunchControl.setArrowButton(UP_ARROW, State.scrollState.canScrollUp());
+        LaunchControl.setArrowButton(DOWN_ARROW, State.scrollState.canScrollDown());
       }
     }
     else if (State.isClipLaunchMode()) {
@@ -284,6 +288,8 @@ var Events = {
         trackBank.scrollToChannel(0);
       }
     }
+    LaunchControl.setArrowButton(LEFT_ARROW, State.scrollState.canScrollLeft());
+    LaunchControl.setArrowButton(RIGHT_ARROW, State.scrollState.canScrollRight());
   },
 
 
@@ -318,6 +324,66 @@ var Events = {
 
   onUserNotificationsEnabledChange: function(notificationsEnabled) {
     State.notificationsEnabled = notificationsEnabled;
+  },
+
+  // disabled because onCanSelectNextTrackChange does not work properly
+  // We rely on the selected track index and track count instead
+  //onCanSelectPreviousTrackChange: function(canSelect) {
+  //  println("canSelectPreviousTrack: " + canSelect);
+  //  State.scrollState.canSelectPreviousTrack = canSelect;
+  //  if (State.isDeviceControlMode()) {
+  //    LaunchControl.setArrowButton(UP_ARROW, canSelect);
+  //  }
+  //},
+  //
+  //onCanSelectNextTrackChange: function(canSelect) {
+  //  println("canSelectNextTrack: " + canSelect);
+  //  State.scrollState.canSelectNextTrack = canSelect;
+  //  if (State.isDeviceControlMode()) {
+  //    LaunchControl.setArrowButton(DOWN_ARROW, canSelect);
+  //  }
+  //},
+
+  onCanSelectPreviousDeviceChange: function(canSelect) {
+    State.scrollState.canSelectPreviousDevice = canSelect;
+    if (State.isDeviceControlMode()) {
+      LaunchControl.setArrowButton(UP_ARROW, canSelect);
+    }
+  },
+
+  onCanSelectNextDeviceChange: function(canSelect) {
+    State.scrollState.canSelectNextDevice = canSelect;
+    if (State.isDeviceControlMode()) {
+      LaunchControl.setArrowButton(DOWN_ARROW, canSelect);
+    }
+  },
+
+  onCanScrollTracksUpChange: function(canScroll) {
+    State.scrollState.canScrollTracksUp = canScroll;
+    if (!State.isDeviceControlMode()) {
+      LaunchControl.setArrowButton(LEFT_ARROW, canScroll);
+    }
+  },
+
+  onCanScrollTracksDownChange: function(canScroll) {
+    State.scrollState.canScrollTracksDown = canScroll;
+    if (!State.isDeviceControlMode()) {
+      LaunchControl.setArrowButton(RIGHT_ARROW, canScroll);
+    }
+  },
+
+  onCanScrollScenesUpChange: function(canScroll) {
+    State.scrollState.canScrollScenesUp = canScroll;
+    if(State.isClipLaunchMode()) {
+      LaunchControl.setArrowButton(UP_ARROW, canScroll);
+    }
+  },
+
+  onCanScrollScenesDownChange: function(canScroll) {
+    State.scrollState.canScrollScenesDown = canScroll;
+    if(State.isClipLaunchMode()) {
+      LaunchControl.setArrowButton(DOWN_ARROW, canScroll);
+    }
   }
 
 };

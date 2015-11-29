@@ -63,5 +63,5 @@ The current version of this project is a 1.0 release candidate. It should be per
 ## License
 
 This software is released under [the MIT license](https://en.wikipedia.org/wiki/MIT_License).
-See [license.txt](https://github.com/adamjmurray/bitwig-launch-control/blob/master/license.txt)
+See [license.txt](https://github.com/adamjmurray/bitwig-launch-control/blob/master/license.txt).
 Basically, do whatever you want with it. The developers are not liable for any issues encountered.
