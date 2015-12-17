@@ -55,7 +55,7 @@ and I'll consider it.
 
 | Version | Release&nbsp;Date | Notes |
 | ------- | ------------ | ----- |
-| 1.0     | coming soon | Initial Release. Reproduces the LaunchControl's Ableton Live features.
+| 1.0     | December 1, 2015 | Initial Release. Reproduces the LaunchControl's Ableton Live features.
 
 The current version of this project is a 1.0 release candidate. It should be perfectly useable.
 
