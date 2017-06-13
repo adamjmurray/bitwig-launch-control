@@ -50,7 +50,7 @@ load("Events.js");
 load("LaunchControl.js");
 
 
-host.defineController("Novation", "Launch Control", "0.0.1",
+host.defineController("Novation", "Launch Control", "1.0.1",
                       "7c1c2f16-4698-4acf-9c08-3370bf52af74", "Adam Murray");
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(["Launch Control"], ["Launch Control"]);
@@ -64,7 +64,7 @@ function init() {
   host.getMidiInPort(0).setMidiCallback(Events.onMidi);
   host.getMidiInPort(0).setSysexCallback(Events.onSysex);
 
-  trackBank = host.createTrackBank(CHANNELS, 2, 1);
+  trackBank = host.createTrackBank(CHANNELS, 256, 1);
   effectTrackBank = host.createEffectTrackBank(1, 1);
   cursorTrack = host.createArrangerCursorTrack(0, 1);
   cursorDevice = host.createEditorCursorDevice();

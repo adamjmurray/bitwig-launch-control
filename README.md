@@ -35,13 +35,7 @@ for usage instructions.
 
 ## Known Issues and Limitations
 
-* Can't scroll to master track in device control mode.
-
-* Send scrolling is buggy if you delete a *named* send.
-  Appears to be a bug in Bitwig that may clear up in the future.
-
-* Sometimes the first attempt to switch the Factory Template (AKA mode) doesn't work.
-  Workaround: Switch to another template and back to the one you want.
+- A maximum of 256 send tracks are supported.
 
 
 ## Feature Requests
@@ -55,6 +49,7 @@ and I'll consider it.
 
 | Version | Release&nbsp;Date | Notes |
 | ------- | ------------ | ----- |
+| 1.0.1   | June 13, 2017 | Fixed changing send amounts to send tracks 3 and higher
 | 1.0     | December 1, 2015 | Initial Release. Reproduces the LaunchControl's Ableton Live features.
 
 The current version of this project is a 1.0 release candidate. It should be perfectly useable.
