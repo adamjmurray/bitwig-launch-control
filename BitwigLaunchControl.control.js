@@ -50,8 +50,8 @@ load("Events.js");
 load("LaunchControl.js");
 
 
-host.defineController("Novation", "Launch Control", "1.0.1",
-                      "7c1c2f16-4698-4acf-9c08-3370bf52af74", "Adam Murray");
+host.defineController("Novation", "Launch Control", "1.0.2",
+  "7c1c2f16-4698-4acf-9c08-3370bf52af74", "Adam Murray");
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(["Launch Control"], ["Launch Control"]);
 

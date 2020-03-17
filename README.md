@@ -14,7 +14,7 @@ See [Bitwig's controller scripts page](http://www.bitwig.com/en/community/contro
 
 1. Download [bitwig-launch-control.zip](https://github.com/adamjmurray/bitwig-launch-control/archive/master.zip)
 2. Unzip in:
-    * Windows: `%USERPROFILE%\Documents\Bitwig Studio\Controller Scripts\ `
+    * Windows: `%USERPROFILE%\Documents\Bitwig Studio\Controller Scripts\`
     * Mac: `~/Documents/Bitwig Studio/Controller Scripts/`
     * Linux: `~/Bitwig Studio/Controller Scripts/`
 3. Start / restart Bitwig Studio
@@ -49,6 +49,7 @@ and I'll consider it.
 
 | Version | Release&nbsp;Date | Notes |
 | ------- | ------------ | ----- |
+| 1.0.2   | March 16, 2020 | Fixed error that could occur when changing to clip launch mode
 | 1.0.1   | June 13, 2017 | Fixed changing send amounts to send tracks 3 and higher
 | 1.0     | December 1, 2015 | Initial Release. Reproduces the LaunchControl's Ableton Live features.
 

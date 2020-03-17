@@ -3,7 +3,7 @@ var LaunchControl = {
   channel: null,
 
 
-  reset: function (isInitializing) {
+  reset: function(isInitializing) {
     for (var i = 0; i < 16; i++) {
       sendMidi(176 + i, 0, 0);
     }
@@ -14,7 +14,7 @@ var LaunchControl = {
   },
 
 
-  selectTemplate: function (index) {
+  selectTemplate: function(index) {
     if (!(index >= 0 && index < 16)) return;
     var templateByte = "0" + index.toString(16);
     this.channel = index;
@@ -23,7 +23,7 @@ var LaunchControl = {
 
 
   // TODO: collapse these 3 into a single function
-  macroIndex: function (data1) {
+  macroIndex: function(data1) {
     if (data1 >= 21 && data1 <= 24) {
       return data1 - 21;
     }
@@ -33,20 +33,20 @@ var LaunchControl = {
     }
   },
 
-  knobIndexFirstRow: function (data1) {
+  knobIndexFirstRow: function(data1) {
     if (data1 >= 21 && data1 <= 28) {
       return data1 - 21;
     }
   },
 
-  knobIndexSecondRow: function (data1) {
+  knobIndexSecondRow: function(data1) {
     if (data1 >= 41 && data1 <= 48) {
       return data1 - 41;
     }
   },
 
 
-  buttonIndex: function (data1) {
+  buttonIndex: function(data1) {
     if (data1 >= 9 && data1 <= 12) {
       return data1 - 9;
     }
@@ -56,7 +56,7 @@ var LaunchControl = {
   },
 
 
-  isButtonPressedDown: function (data2) {
+  isButtonPressedDown: function(data2) {
     return data2 > 0;
   },
 
@@ -80,7 +80,7 @@ var LaunchControl = {
   /**
    * Set a (bottom row) button color approximating the raw red,green,blue values from Bitwig
    */
-  displayClipColor: function (index, red, green, blue) {
+  displayClipColor: function(index, red, green, blue) {
     // use exponential range to coerce low values to 0
     this.setButton(index, red * red, green * green);
   },
@@ -102,10 +102,10 @@ var LaunchControl = {
   /**
    * Set a (bottom row) button's red and green LEDs. Values can go from 0.0 - 1.0
    */
-  setButton: function (index, red, green) {
+  setButton: function(index, red, green) {
     var data1,
       data2 = this.color(red, green);
-    if(index < 4) {
+    if (index < 4) {
       data1 = index + 9;
     }
     else {
@@ -123,7 +123,7 @@ var LaunchControl = {
   color: function(red, green) {
     var color = 16 * Math.round(3 * green) + Math.round(3 * red) + 12;
 
-    if(color <= 12 && (red > 0 || green > 0)) {
+    if (color <= 12 && (red > 0 || green > 0)) {
       return 13; // return dim red instead of 'off' when there should be some color
     }
     else {
@@ -137,14 +137,14 @@ var LaunchControl = {
   },
 
 
-  refreshButtons: function () {
+  refreshButtons: function() {
     var i, rgb;
     for (i = 0; i < CHANNELS; i++) {
       if (State.isMixerMode()) {
         LaunchControl.displayTrackActivated(i, State.trackBank.activatedStates[i]);
       }
       else if (State.isClipLaunchMode()) {
-        rgb = State.trackBank.clipColors[i];
+        rgb = State.trackBank.clipColors[i] || [0, 0, 0];
         LaunchControl.displayClipColor(i, rgb[0], rgb[1], rgb[2]);
       }
       else if (State.isDeviceControlMode()) {
